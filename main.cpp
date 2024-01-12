@@ -18,13 +18,9 @@ int main() {
     fstream p1,p2;
     string ex;
     int x;
-    float alfa;
-    int stopWar;
     float opt_float;
-    p1.open("sa_tsp.ini",ios::in);
+    p1.open("aco_tsp.ini",ios::in);
     if(p1.good()){
-        p1>>alfa;
-        p1>>stopWar;
         while(!p1.eof()){
             fileIn file;
             p1>> name;

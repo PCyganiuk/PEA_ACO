@@ -81,12 +81,52 @@ int TSP::aco() {
     vector<int> bestPath;
     double alpha = 1.0;
     double beta = 3.5;
-    double ro = 0.5;
-    int m = n;
+    double ro = 0.5; //evaporation
     int Cnn = calcInitCnn();
     double initPher = (double) n / (double) Cnn;
     int iterations = 1;
     double pher = 100.0; //ilość feromonów zostawianych przez mrówkę
+    vector<vector<double>> pheromones;
+    for(int i = 0;i < n;i++){
+        vector<double> ph;
+        for(int j = 0; j < n; j++)
+            ph.push_back(initPher);
+        pheromones.push_back(ph);
+    }
+    vector<vector<double>> pheromones_to_add;
+    for(int i = 0; i < n; i++){
+        vector<double> ph;
+        for(int j = 0; j < n; j++)
+            ph.push_back(0.0);
+        pheromones_to_add.push_back(ph);
+    }
+    int i = 0;
+    while(i++ < iterations){
+        cout<<"iteracja: " << i <<endl;
+        for(int m = 0; m < n; m++){
+            int startNode = m;
+            vector<int> path;
+            path.push_back(startNode);
+            vector<int> vertLeft; // wierzchołki możliwe do wybrania
+            for(int x = 0; x < n-1; x++){
+                int cn = path.back();
+                cout<< cn << " " << endl;
+                double sumFactor = 0.0;
+                for(int & it : vertLeft)
+                    sumFactor += (pow(pheromones[cn][it],alpha)) * pow((double) 1.0/ (double) graph[cn][it],beta);
+
+                vector<double> prob;
+
+                for(int & ir : vertLeft){
+                    double p = ((pow(pheromones[cn][ir],alpha))*(pow((double) 1.0/ (double) graph[cn][ir],beta)))/sumFactor;
+                    prob.push_back(p);
+                }
+
+
+            }
+
+        }
+    }
     
     return bestCost;
 }
