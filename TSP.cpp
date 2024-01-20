@@ -78,7 +78,6 @@ int TSP::aco() {
     std::mt19937 g(rd());
     std::uniform_real_distribution<double> num(0.0, 1.0);
     std::uniform_int_distribution<int> node(0, n-1);
-    vector<int> bestPath;
     double alpha = 1.0;
     double beta = 3.5;
     double ro = 0.5; //evaporation
@@ -102,15 +101,19 @@ int TSP::aco() {
     }
     int i = 0;
     while(i++ < iterations){
-        cout<<"iteracja: " << i <<endl;
+        //cout<<"iteracja: " << i <<endl;
         for(int m = 0; m < n; m++){
             int startNode = m;
             vector<int> path;
             path.push_back(startNode);
             vector<int> vertLeft; // wierzchołki możliwe do wybrania
+            for(int y = 0; y < n; y++)
+                if(y!=startNode)
+                    vertLeft.push_back(y);
+
             for(int x = 0; x < n-1; x++){
                 int cn = path.back();
-                cout<< cn << " " << endl;
+                //cout<< cn << " " << endl;
                 double sumFactor = 0.0;
                 for(int & it : vertLeft)
                     sumFactor += (pow(pheromones[cn][it],alpha)) * pow((double) 1.0/ (double) graph[cn][it],beta);
@@ -121,12 +124,46 @@ int TSP::aco() {
                     double p = ((pow(pheromones[cn][ir],alpha))*(pow((double) 1.0/ (double) graph[cn][ir],beta)))/sumFactor;
                     prob.push_back(p);
                 }
+                //ruletka
+                partial_sum(prob.begin(),prob.end(),prob.begin());
 
+                double p = num(g);
+                int k = 0;
 
+                for(vector<double>::iterator ix = prob.begin();ix !=prob.end();ix++){
+                    if(p< *ix){
+                        int chosen = vertLeft[k];
+                        path.push_back(chosen);
+                        vertLeft.erase(vertLeft.begin()+k);
+                        break;
+                    }
+                    k++;
+                }
             }
 
+            path.push_back(startNode);
+            int L = calcCost(path);
+            if(L < bestCost || bestCost == INT_MAX){
+                bestCost = L;
+                sPath = path;
+            }
+            double ph = pher/ (double) L;
+
+            for(int r = 0; r < path.size()-1;r++)
+                pheromones_to_add[path[r]][path[r+1]] +=ph;
         }
+        for(i = 0; i < n; i++){
+            for(int k = 0;k <n;k++){
+                pheromones[i][k] = (pheromones[i][k] * ro) + pheromones_to_add[i][k];
+                pheromones_to_add[i][k] = 0.0;
+            }
+        }
+
     }
+    sPath.pop_back();
+    vector<int>::iterator itt = find(sPath.begin(),sPath.end(),0);
+    rotate(sPath.begin(),itt,sPath.end());
+    sPath.push_back(0);
     
     return bestCost;
 }
