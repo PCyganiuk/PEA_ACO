@@ -4,7 +4,7 @@
 #include "TSP.h"
 
 using namespace std;
-LARGE_INTEGER sTime,eTime, freq,pcFreq,diffTime;
+LARGE_INTEGER sTime,eTime, freq,pcFreq,diffTime, avgDiffTime;
 
 struct fileIn{
     string name;
@@ -43,6 +43,8 @@ int main() {
     p2.open(ex,ios::out);
     while(!fileNames.empty()) {
         int path;
+        float avgDelta = 0.0;
+        avgDiffTime.QuadPart = 0;
         p2<<fileNames.front().name<<" "<<fileNames.front().optCost;
         cout<<fileNames.front().name<<" "<<fileNames.front().optCost;
         p2<<endl;
@@ -57,14 +59,19 @@ int main() {
             path = Graph.aco();
             QueryPerformanceCounter(&eTime);
             diffTime.QuadPart = (eTime.QuadPart - sTime.QuadPart) / pcFreq.QuadPart;
+            avgDiffTime.QuadPart += diffTime.QuadPart;
             opt_float = fileNames.front().optCost;
             float delta = (((float)path - opt_float)/opt_float)*100;
+            avgDelta += delta;
             cout<<"weight: "<<path<<" "<< delta<<"% path: 0 ";
             for(int k = 0;k < Graph.sPath.size();k++)
                 cout<<Graph.sPath[k]<<" ";
             cout<<endl;
-            p2 << diffTime.QuadPart << " " <<path<<" "<< delta<<"%"<<endl;
+            //p2 << diffTime.QuadPart << " " <<path<<" "<< delta<<"%"<<endl;
         }
+        avgDelta /= fileNames.front().times;
+        avgDiffTime.QuadPart /= fileNames.front().times;
+        p2 << avgDiffTime.QuadPart << " " <<path<<" "<< avgDelta <<"%"<<endl;
         p2 << endl;
         fileNames.pop_front();
     }
