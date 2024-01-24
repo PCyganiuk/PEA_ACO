@@ -53,7 +53,6 @@ int main() {
         pcFreq.QuadPart = freq.QuadPart / 1000000;//microseconds
         TSP Graph;
         Graph.readFromFile(fileNames.front().name);
-        //Graph.displayMatrix();
         for (int j = 0; j < fileNames.front().times; j++) {
             QueryPerformanceCounter(&sTime);
             path = Graph.aco();
@@ -63,11 +62,10 @@ int main() {
             opt_float = fileNames.front().optCost;
             float delta = (((float)path - opt_float)/opt_float)*100;
             avgDelta += delta;
-            cout<<"weight: "<<path<<" "<< delta<<"% path: 0 ";
+            cout<<"weight: "<<path<<" "<< delta<<"% path: ";
             for(int k = 0;k < Graph.sPath.size();k++)
                 cout<<Graph.sPath[k]<<" ";
             cout<<endl;
-            //p2 << diffTime.QuadPart << " " <<path<<" "<< delta<<"%"<<endl;
         }
         avgDelta /= fileNames.front().times;
         avgDiffTime.QuadPart /= fileNames.front().times;

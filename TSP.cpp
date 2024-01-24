@@ -73,7 +73,7 @@ int TSP::calcInitCnn() {
 }
 
 int TSP::aco() {
-    int bestCost = INT_MAX;
+    int bestCost = -1;
     std::random_device rd;
     std::mt19937 g(rd());
     std::uniform_real_distribution<double> num(0.0, 1.0);
@@ -143,7 +143,7 @@ int TSP::aco() {
 
             path.push_back(startNode);
             int L = calcCost(path);
-            if(L < bestCost || bestCost == INT_MAX){
+            if(L < bestCost || bestCost == -1){
                 bestCost = L;
                 sPath = path;
             }
